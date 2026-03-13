@@ -1153,10 +1153,4 @@ app.get('/admin', function(req, res) {
     res.sendFile(path.join(__dirname, 'pages', 'admin.html'));
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, function() {
-    console.log('Server running on port ' + PORT);
-});
-
 module.exports = app;
