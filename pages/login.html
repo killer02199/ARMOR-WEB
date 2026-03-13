@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Armor - Panel Administratora</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="../images/logo/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../images/logo/android-chrome-512x512.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/logo/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/logo/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../images/logo/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="../images/logo/android-chrome-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="../images/logo/android-chrome-512x512.png">
+    <link rel="manifest" href="../images/logo/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        // Zabezpieczenia przed kopiowaniem
+        document.addEventListener('contextmenu', function(e) { 
+            e.preventDefault(); 
+            return false; 
+        });
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    </script>
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: rgba(20, 25, 35, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .login-logo {
+            font-family: 'Michroma', sans-serif;
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .login-logo i {
+            font-size: 2rem;
+        }
+        
+        .login-subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        .login-description {
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .discord-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #5865F2, #4752C4);
+            color: white;
+            padding: 16px 35px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .discord-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.4);
+        }
+        
+        .login-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .login-footer a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid #ff4757;
+            color: #ff4757;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .success-message {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        
+        .back-btn:hover {
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-bg"></div>
+    <div class="login-container">
+        <div class="login-box">
+            <a href="//" class="back-btn"><i class="fas fa-arrow-left"></i> Wróć do strony</a>
+            
+            <div class="login-logo">
+                <i class="fas fa-shield-alt"></i>
+                ARMOR
+            </div>
+            <p class="login-subtitle">Panel Administratora</p>
+            
+            <div id="message"></div>
+            
+            <p class="login-description">Zaloguj się przez Discord aby uzyskać dostęp do panelu administratora. Musisz mieć odpowiednią rolę na serwerze Discord.</p>
+            
+            <a href="/auth/discord" class="discord-btn">
+                <i class="fab fa-discord"></i>
+                Zaloguj przez Discord
+            </a>
+            
+            <div class="login-footer">
+                <p style="color: #666; font-size: 0.9rem;">Tylko dla uprawnionych osób</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const success = urlParams.get('success');
+        
+        const messageDiv = document.getElementById('message');
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        
+        if (error) {
+            if (error === 'no_roles') {
+                messageDiv.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Nie masz uprawnień do panelu administratora!</div>';
+            } else if (error === 'auth') {
+                messageDiv.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Błąd uwierzytelniania. Spróbuj ponownie.</div>';
+            } else {
+                messageDiv.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Wystąpił błąd logowania.</div>';
+            }
+        } else if (success === 'logged_out') {
+            messageDiv.innerHTML = '<div class="success-message"><i class="fas fa-check-circle"></i> Wylogowano pomyślnie!</div>';
+        }
+    </script>
+</body>
+</html>

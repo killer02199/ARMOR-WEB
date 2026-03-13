@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARMOR — Sklep i Produkcja</title>
+
+  <link rel="icon" type="image/png" sizes="192x192" href="../images/logo/android-chrome-192x192.png" />
+  <link rel="manifest" href="../images/logo/site.webmanifest" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root{
+      --bg:#070b11;
+      --bg2:#0d1420;
+      --panel:rgba(14,22,34,.88);
+      --panel2:rgba(255,255,255,.03);
+      --line:rgba(0,234,255,.16);
+      --cyan:#00eaff;
+      --cyan2:#90f7ff;
+      --green:#3dffad;
+      --orange:#ffae42;
+      --red:#ff5378;
+      --gold:#ffe37a;
+      --text:#ecfaff;
+      --muted:rgba(236,250,255,.62);
+      --shadow:0 18px 50px rgba(0,0,0,.35);
+      --r1:24px;
+      --r2:18px;
+      --r3:14px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      min-height:100vh;
+      color:var(--text);
+      font-family:'Rajdhani',sans-serif;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(0,234,255,.12), transparent 25%),
+        radial-gradient(circle at 90% 85%, rgba(255,174,66,.10), transparent 25%),
+        linear-gradient(180deg,#05080e 0%, #0b1018 50%, #06090f 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size:40px 40px;
+      pointer-events:none;
+      z-index:0;
+      opacity:.45;
+    }
+
+    .ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+    .orb{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(90px);
+      opacity:.18;
+      animation:floatOrb 16s ease-in-out infinite;
+    }
+    .orb.one{width:340px;height:340px;background:var(--cyan);left:-90px;top:-80px}
+    .orb.two{width:280px;height:280px;background:var(--orange);right:-70px;bottom:-70px;animation-delay:-5s}
+    .orb.three{width:220px;height:220px;background:var(--green);left:50%;top:25%;animation-delay:-8s;opacity:.1}
+    @keyframes floatOrb{
+      0%,100%{transform:translate(0,0) scale(1)}
+      25%{transform:translate(30px,-25px) scale(1.08)}
+      50%{transform:translate(-18px,18px) scale(.95)}
+      75%{transform:translate(-28px,-15px) scale(1.02)}
+    }
+
+    .shell{
+      position:relative;
+      z-index:2;
+      width:min(1440px, calc(100% - 20px));
+      margin:14px auto 40px;
+      padding:14px;
+    }
+
+    .topbar{
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:14px;
+      align-items:center;
+      padding:16px 18px;
+      margin-bottom:18px;
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:rgba(8,13,22,.84);
+      backdrop-filter:blur(14px);
+      box-shadow:var(--shadow);
+      position:sticky;
+      top:10px;
+      z-index:50;
+    }
+
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand-icon{
+      width:58px;height:58px;border-radius:18px;
+      display:grid;place-items:center;
+      color:var(--cyan);
+      font-size:1.45rem;
+      background:linear-gradient(135deg, rgba(0,234,255,.18), rgba(255,174,66,.10));
+      border:1px solid var(--line);
+    }
+    .brand-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:clamp(1rem,2vw,1.35rem);
+      letter-spacing:.2em;
+      text-transform:uppercase;
+    }
+    .brand-subtitle{
+      color:var(--muted);
+      margin-top:4px;
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+    }
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .tab-btn,.ghost-btn,.filter-btn,.buy-btn,.craft-btn,.small-btn,.chat-send,.modal-btn{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--panel2);
+      color:var(--muted);
+      transition:.25s ease;
+      cursor:pointer;
+      font:inherit;
+    }
+    .tab-btn{
+      padding:10px 16px;
+      font-family:'Orbitron',sans-serif;
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .tab-btn:hover,.tab-btn.active,.ghost-btn:hover,.filter-btn:hover,.filter-btn.active{
+      color:var(--cyan);
+      border-color:rgba(0,234,255,.45);
+      background:rgba(0,234,255,.08);
+      transform:translateY(-1px);
+    }
+
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      color:var(--muted);
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--panel2);
+      padding:12px 16px;
+      transition:.25s ease;
+    }
+    .back-btn:hover{color:var(--cyan);border-color:rgba(0,234,255,.45)}
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .card,.section,.shop-card,.recipe-card,.resource-card,.stat-card,.inventory-card,.workstation-card,.modal-card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+    }
+
+    .card{padding:28px;position:relative;overflow:hidden}
+    .card::before,.shop-card::before,.recipe-card::before,.workstation-card::before,.resource-card::before,.inventory-card::before{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(0,234,255,.06), transparent 45%, rgba(255,174,66,.03));
+      opacity:0;
+      transition:.25s ease;
+      pointer-events:none;
+    }
+    .card:hover::before,.shop-card:hover::before,.recipe-card:hover::before,.workstation-card:hover::before,.resource-card:hover::before,.inventory-card:hover::before{opacity:1}
+
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:10px;
+      padding:10px 16px;
+      border-radius:999px;
+      border:1px solid rgba(0,234,255,.24);
+      background:rgba(0,234,255,.08);
+      color:var(--cyan2);
+      font-size:.8rem;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin-bottom:18px;
+    }
+    .hero-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:clamp(2rem,4vw,3.25rem);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      line-height:1.05;
+      margin-bottom:14px;
+      background:linear-gradient(90deg,var(--cyan),var(--orange));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .hero-text{font-size:1.08rem;line-height:1.7;color:var(--muted);max-width:700px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+    .ghost-btn{
+      padding:12px 16px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+    }
+    .ghost-btn.primary{
+      background:linear-gradient(135deg,var(--cyan),#00a4b2);
+      color:#021018;
+      border-color:transparent;
+      font-weight:700;
+    }
+
+    .hero-side{display:grid;gap:18px}
+    .showcase-image{
+      width:100%;height:240px;object-fit:cover;
+      border-radius:20px;border:1px solid rgba(255,255,255,.06);
+      display:block;
+    }
+
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .stat-card{padding:18px;text-align:center}
+    .stat-icon{
+      width:42px;height:42px;border-radius:50%;
+      display:grid;place-items:center;
+      margin:0 auto 10px;
+      background:rgba(0,234,255,.1);
+      color:var(--cyan);
+    }
+    .stat-value{font-family:'Orbitron',sans-serif;font-size:1.35rem}
+    .stat-label{margin-top:6px;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+
+    .section{padding:22px;margin-bottom:18px}
+    .section-header{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+    .section-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.35rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .section-subtitle{color:var(--muted);margin-top:6px}
+
+    .toolbar,.toolbar-side,.category-row,.resources-controls{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    }
+    .toolbar{justify-content:space-between;margin-bottom:18px}
+    .ghost-btn, .filter-btn, .small-btn{padding:11px 14px}
+    .filter-btn.active{box-shadow:0 0 0 1px rgba(0,234,255,.12) inset}
+
+    .search-box, .select-box{
+      min-height:46px;
+      display:flex;align-items:center;gap:10px;
+      padding:0 14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(0,0,0,.18);
+      color:var(--muted);
+    }
+    .search-box input,.select-box select{
+      background:transparent;border:none;outline:none;color:var(--text);font:inherit;
+      min-width:150px;
+    }
+    .select-box select option{background:#0c1420;color:var(--text)}
+
+    .products-grid,.resources-panel,.workstations,.inventory-grid{
+      display:grid;gap:18px;
+    }
+    .products-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+    .resources-panel{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .workstations{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+    .inventory-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+
+    .production-panel{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .panel-stat{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:18px;
+      text-align:center;
+    }
+    .panel-stat-icon{
+      width:42px;height:42px;
+      display:grid;place-items:center;
+      margin:0 auto 10px;
+      border-radius:50%;
+      background:rgba(0,234,255,.1);
+      color:var(--cyan);
+    }
+    .panel-stat-value{font-family:'Orbitron',sans-serif;font-size:1.25rem}
+    .panel-stat-label{margin-top:6px;color:var(--muted);font-size:.8rem;text-transform:uppercase}
+
+    .resource-item{
+      padding:16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(255,255,255,.03);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .resource-item.low{border-color:rgba(255,83,120,.35)}
+    .resource-name{font-weight:600}
+    .resource-qty{font-family:'Orbitron',sans-serif;color:var(--cyan)}
+
+    .workstation-card{padding:18px;text-align:center;position:relative;overflow:hidden}
+    .workstation-icon{
+      width:48px;height:48px;display:grid;place-items:center;
+      margin:0 auto 12px;border-radius:14px;
+      color:var(--cyan);background:rgba(0,234,255,.08);border:1px solid rgba(0,234,255,.18)
+    }
+    .workstation-name{
+      font-family:'Orbitron',sans-serif;
+      font-size:.9rem;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .workstation-desc{margin-top:8px;color:var(--muted)}
+    .workstation-status{margin-top:10px;color:var(--green);font-size:.82rem;text-transform:uppercase}
+
+    .production-flow{
+      display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;
+      padding:16px;margin-bottom:18px;
+      border:1px solid var(--line);border-radius:20px;background:var(--panel);box-shadow:var(--shadow);
+    }
+    .flow-step{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 14px;border-radius:12px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      color:var(--muted);
+    }
+    .flow-step.active{border-color:rgba(0,234,255,.4);color:var(--cyan)}
+    .flow-step.completed{border-color:rgba(61,255,173,.4);color:var(--green)}
+    .flow-icon{
+      width:36px;height:36px;border-radius:10px;
+      display:grid;place-items:center;
+      background:rgba(0,234,255,.08);
+    }
+    .flow-arrow{color:var(--muted)}
+
+    .cennik-card{
+      padding:18px;
+      display:grid;
+      grid-template-columns:88px 1fr auto;
+      gap:16px;
+      align-items:center;
+      position:relative;overflow:hidden;
+    }
+    .product-image{
+      width:88px;height:88px;border-radius:16px;overflow:hidden;
+      background:rgba(0,234,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+      display:grid;place-items:center;
+    }
+    .product-image img{width:100%;height:100%;object-fit:cover}
+    .product-name{
+      font-family:'Orbitron',sans-serif;
+      font-size:.95rem;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .product-desc{margin-top:8px;color:var(--muted);line-height:1.5}
+    .inventory-badge{
+      display:inline-flex;padding:6px 10px;border-radius:999px;
+      margin-top:10px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--muted);font-size:.76rem;
+    }
+    .product-price{
+      margin-top:10px;
+      font-family:'Orbitron',sans-serif;
+      font-size:1.25rem;color:var(--orange);
+      text-shadow:0 0 18px rgba(255,174,66,.18);
+    }
+
+    .buy-btn,.craft-btn,.submit-btn{
+      padding:11px 16px;
+      background:linear-gradient(135deg,var(--cyan),#00a3b1);
+      color:#031018;border-color:transparent;
+      font-family:'Orbitron',sans-serif;font-size:.75rem;
+      font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    }
+    .buy-btn:hover,.craft-btn:hover,.submit-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(0,234,255,.22)}
+
+    .production-card{
+      border-radius:24px;
+      overflow:hidden;
+      position:relative;
+    }
+    .production-card .product-header{
+      padding:18px;
+      display:grid;
+      grid-template-columns:74px 1fr auto;
+      gap:14px;
+      align-items:center;
+      cursor:pointer;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .product-image-small{
+      width:74px;height:74px;border-radius:16px;overflow:hidden;
+      background:rgba(0,234,255,.05);border:1px solid rgba(255,255,255,.06);
+    }
+    .product-image-small img{width:100%;height:100%;object-fit:cover}
+    .product-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .difficulty,.total-time,.product-status{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 10px;border-radius:999px;
+      font-size:.72rem;
+    }
+    .difficulty-łatwy{color:var(--green);background:rgba(61,255,173,.08);border:1px solid rgba(61,255,173,.22)}
+    .difficulty-średni{color:var(--orange);background:rgba(255,174,66,.08);border:1px solid rgba(255,174,66,.22)}
+    .difficulty-trudny{color:var(--red);background:rgba(255,83,120,.08);border:1px solid rgba(255,83,120,.22)}
+    .difficulty-elite{color:var(--gold);background:rgba(255,227,122,.08);border:1px solid rgba(255,227,122,.22)}
+    .total-time,.product-status{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--muted)}
+
+    .expand-icon{color:var(--muted);transition:.25s}
+    .production-card.expanded .expand-icon{transform:rotate(180deg)}
+    .product-body{display:none;padding:18px}
+    .production-card.expanded .product-body{display:block}
+
+    .produce-section{margin-bottom:14px}
+    .produce-btn{
+      width:100%;
+      padding:14px 16px;
+      border:none;border-radius:14px;
+      background:linear-gradient(135deg,var(--cyan),#00a4b2);
+      color:#031018;
+      font-family:'Orbitron',sans-serif;font-weight:700;
+      text-transform:uppercase;letter-spacing:.06em;
+      cursor:pointer;
+    }
+    .produce-btn.completed-btn{background:linear-gradient(135deg,var(--green),#1fcb76)}
+    .produce-btn:disabled{
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.35);
+      border:1px solid rgba(255,255,255,.08);
+      cursor:not-allowed;
+    }
+
+    .stages-container{display:grid;gap:12px}
+    .stage{
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;
+      background:rgba(255,255,255,.02);
+      overflow:hidden;
+    }
+    .stage.active{border-color:rgba(0,234,255,.35)}
+    .stage.completed{border-color:rgba(61,255,173,.35)}
+    .stage-header{
+      padding:14px;
+      display:grid;
+      grid-template-columns:40px 1fr auto auto;
+      gap:12px;
+      align-items:center;
+    }
+    .stage-number{
+      width:36px;height:36px;border-radius:50%;
+      display:grid;place-items:center;
+      font-family:'Orbitron',sans-serif;
+      color:var(--cyan);
+      background:rgba(0,234,255,.08);
+      border:1px solid rgba(0,234,255,.22);
+    }
+    .stage-name{
+      display:flex;align-items:center;gap:8px;
+      font-family:'Orbitron',sans-serif;
+      font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;
+    }
+    .stage-workstation{color:var(--muted);font-size:.8rem}
+    .no-resources{color:var(--red);font-size:.78rem}
+    .stage-body{padding:0 14px 14px}
+    .stage-time{color:var(--muted);margin-bottom:10px;font-size:.82rem}
+    .stage-flow{
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      gap:10px;
+      align-items:start;
+    }
+    .stage-io{
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:12px;
+      background:rgba(0,0,0,.16);
+      padding:10px;
+    }
+    .io-label{
+      font-size:.72rem;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .io-item{
+      display:flex;justify-content:space-between;gap:10px;
+      padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);
+      font-size:.84rem;
+    }
+    .io-item:last-child{border-bottom:none}
+    .io-item.insufficient,.io-qty.insufficient{color:var(--red)}
+    .io-qty{font-family:'Orbitron',sans-serif;color:var(--orange)}
+    .stage-arrow{color:var(--muted);padding-top:22px}
+
+    .inventory-card,.resource-card{
+      padding:18px;position:relative;overflow:hidden;
+    }
+    .inventory-top,.resource-top{
+      display:flex;justify-content:space-between;gap:10px;align-items:start;
+    }
+    .inventory-icon,.resource-icon{
+      width:48px;height:48px;border-radius:14px;
+      display:grid;place-items:center;
+      margin-bottom:12px;
+      color:var(--cyan);
+      background:rgba(0,234,255,.08);
+      border:1px solid rgba(0,234,255,.18);
+    }
+    .inventory-name{
+      font-family:'Orbitron',sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:.9rem;
+    }
+    .inventory-value,.resource-value{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.3rem;color:var(--cyan);
+    }
+    .resource-value.low{color:var(--red)}
+    .inventory-meta{margin-top:8px;color:var(--muted);line-height:1.5}
+
+    .empty-state{
+      padding:42px 18px;
+      text-align:center;
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:16px;
+      grid-column:1/-1;
+    }
+    .empty-state i{font-size:2.4rem;margin-bottom:12px;opacity:.55}
+
+    .chat-fab{
+      position:fixed;
+      right:22px;bottom:22px;
+      width:62px;height:62px;border-radius:50%;
+      border:none;
+      background:linear-gradient(135deg,var(--cyan),#00a2b2);
+      color:#031018;
+      box-shadow:0 14px 34px rgba(0,234,255,.24);
+      z-index:80;
+      cursor:pointer;
+      display:grid;place-items:center;
+      font-size:1.2rem;
+    }
+
+    .chat-modal{
+      position:fixed;
+      right:22px;bottom:94px;
+      width:min(380px, calc(100vw - 24px));
+      height:520px;
+      display:none;
+      flex-direction:column;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      z-index:90;
+      overflow:hidden;
+    }
+    .chat-header{
+      padding:14px 16px;
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(0,234,255,.08);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .chat-header span{
+      font-family:'Orbitron',sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:.82rem;color:var(--cyan)
+    }
+    .chat-close{
+      background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem
+    }
+    .chat-messages{
+      flex:1;overflow-y:auto;padding:14px;
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .chat-message{
+      max-width:85%;
+      padding:10px 12px;
+      border-radius:14px;
+      line-height:1.5;
+    }
+    .chat-message.system,.chat-message.support{
+      align-self:flex-start;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .chat-message.user{
+      align-self:flex-end;
+      background:rgba(0,234,255,.10);
+      border:1px solid rgba(0,234,255,.18);
+    }
+    .chat-input{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      padding:14px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+    .chat-input input{
+      min-height:44px;padding:10px 12px;
+      border-radius:12px;border:1px solid var(--line);
+      background:rgba(0,0,0,.22);
+      color:var(--text);outline:none;font:inherit;
+    }
+    .chat-send{
+      min-width:48px;border:none;
+      background:linear-gradient(135deg,var(--cyan),#00a2b2);
+      color:#031018;
+    }
+
+    .overlay{
+      position:fixed;inset:0;display:none;
+      align-items:center;justify-content:center;
+      background:rgba(5,8,14,.84);
+      backdrop-filter:blur(10px);
+      z-index:100;
+      padding:16px;
+    }
+    .overlay.show{display:flex}
+
+    .modal-card{
+      width:min(760px,100%);
+      padding:24px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modal-close{
+      position:absolute;top:16px;right:16px;
+      width:40px;height:40px;border-radius:12px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--muted);cursor:pointer;
+    }
+    .modal-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.1rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--cyan);
+      margin-bottom:8px;
+    }
+    .modal-text{color:var(--muted);line-height:1.6;margin-bottom:14px}
+    .modal-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-bottom:16px;
+    }
+    .modal-field{display:flex;flex-direction:column;gap:8px}
+    .modal-field.full{grid-column:1/-1}
+    .modal-field label{font-size:.84rem;color:var(--muted)}
+    .modal-field input{
+      min-height:46px;padding:12px 14px;
+      border-radius:12px;border:1px solid var(--line);
+      background:rgba(0,0,0,.24);
+      color:var(--text);outline:none;font:inherit;
+    }
+    .modal-summary{
+      padding:16px;border-radius:16px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      margin-bottom:16px;
+    }
+    .modal-summary-row{
+      display:flex;justify-content:space-between;gap:14px;
+      padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);
+    }
+    .modal-summary-row:last-child{border-bottom:none}
+    .modal-actions{display:flex;justify-content:end;gap:10px;flex-wrap:wrap}
+    .modal-btn{padding:11px 16px}
+    .modal-btn.primary{
+      background:linear-gradient(135deg,var(--cyan),#00a2b2);
+      color:#031018;border-color:transparent;font-weight:700
+    }
+
+    .discount-preview{
+      display:none;
+      gap:10px;align-items:center;
+      padding:12px;border-radius:12px;
+      background:rgba(61,255,173,.08);
+      border:1px solid rgba(61,255,173,.22);
+      margin-bottom:12px;
+    }
+    .discount-badge{
+      padding:6px 10px;border-radius:999px;
+      background:rgba(61,255,173,.12);color:var(--green);font-size:.78rem
+    }
+    .discount-value{color:var(--green);font-family:'Orbitron',sans-serif;font-size:.8rem}
+    .success-icon{
+      width:72px;height:72px;border-radius:50%;
+      margin:0 auto 16px;display:grid;place-items:center;
+      background:rgba(61,255,173,.1);
+      border:1px solid rgba(61,255,173,.22);
+      color:var(--green);font-size:2rem;
+    }
+
+    .game-box{
+      margin-top:16px;
+      padding:16px;
+      border-radius:16px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .game-head{
+      display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .game-title{
+      font-family:'Orbitron',sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--cyan);
+    }
+    .game-timer,.game-score{
+      font-family:'Orbitron',sans-serif;
+      color:var(--orange);
+      font-size:.92rem;
+    }
+
+    .memory-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .memory-card{
+      aspect-ratio:1/1;
+      border-radius:14px;
+      border:1px solid rgba(0,234,255,.18);
+      background:linear-gradient(135deg, rgba(0,234,255,.08), rgba(255,255,255,.03));
+      color:var(--cyan2);
+      display:grid;place-items:center;
+      font-family:'Orbitron',sans-serif;
+      font-size:1.2rem;
+      cursor:pointer;
+      user-select:none;
+      transition:.18s ease;
+    }
+    .memory-card.revealed,.memory-card.done{
+      background:linear-gradient(135deg, rgba(61,255,173,.14), rgba(255,255,255,.04));
+      color:var(--green);
+      border-color:rgba(61,255,173,.28);
+    }
+
+    .sequence-display{
+      display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .sequence-pill{
+      min-width:58px;padding:12px 14px;border-radius:12px;
+      text-align:center;
+      font-family:'Orbitron',sans-serif;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:var(--orange);
+    }
+    .sequence-inputs{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .sequence-btn{
+      min-height:54px;border-radius:14px;border:1px solid rgba(0,234,255,.18);
+      background:rgba(0,234,255,.08);
+      color:var(--cyan2);
+      font-family:'Orbitron',sans-serif;
+      cursor:pointer;
+    }
+
+    .wires-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .wire-column{display:grid;gap:10px}
+    .wire-node{
+      min-height:50px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Orbitron',sans-serif;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .wire-node.selected{
+      border-color:rgba(0,234,255,.45);
+      background:rgba(0,234,255,.12);
+      color:var(--cyan);
+    }
+    .wire-node.matched{
+      border-color:rgba(61,255,173,.35);
+      background:rgba(61,255,173,.10);
+      color:var(--green);
+      cursor:default;
+    }
+
+    .hidden{display:none!important}
+
+    @media (max-width:1100px){
+      .hero{grid-template-columns:1fr}
+    }
+    @media (max-width:900px){
+      .topbar{grid-template-columns:1fr}
+      .production-panel{grid-template-columns:1fr}
+      .products-grid{grid-template-columns:1fr}
+      .cennik-card,.production-card .product-header,.stage-flow,.modal-grid,.wires-grid,.sequence-inputs{
+        grid-template-columns:1fr;
+      }
+      .stage-arrow,.flow-arrow{display:none}
+    }
+    @media (max-width:700px){
+      .shell{width:min(100%, calc(100% - 10px));padding:6px}
+      .section,.card,.modal-card{padding:18px}
+      .stats-grid,.resources-panel,.workstations,.inventory-grid,.memory-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:520px){
+      .stats-grid,.resources-panel,.workstations,.inventory-grid,.memory-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <div class="orb one"></div>
+    <div class="orb two"></div>
+    <div class="orb three"></div>
+  </div>
+
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon"><i class="fas fa-shield-alt"></i></div>
+        <div>
+          <div class="brand-title">ARMOR</div>
+          <div class="brand-subtitle">Sklep taktyczny / centrum produkcji</div>
+        </div>
+      </div>
+
+      <nav class="tabs" aria-label="Zakładki">
+        <button class="tab-btn active" data-tab="shop" type="button"><i class="fas fa-cart-shopping"></i> Sklep</button>
+        <button class="tab-btn" data-tab="production" type="button"><i class="fas fa-gears"></i> Produkcja</button>
+        <button class="tab-btn" data-tab="games" type="button"><i class="fas fa-gamepad"></i> Minigry</button>
+      </nav>
+
+      <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Powrót</a>
+    </header>
+
+    <section class="hero">
+      <article class="card">
+        <div class="hero-badge"><i class="fas fa-bolt"></i> System ARMOR</div>
+        <h1 class="hero-title">Taktyczny sklep i produkcja</h1>
+        <p class="hero-text">
+          Kupuj wyposażenie, zbieraj surowce, produkuj kamizelki i przechodź minigry. Wszystko działa od razu po otwarciu strony.
+        </p>
+        <div class="hero-actions">
+          <a href="#shop-section" class="ghost-btn primary"><i class="fas fa-cart-shopping"></i> Otwórz sklep</a>
+          <a href="#production-section" class="ghost-btn"><i class="fas fa-industry"></i> Otwórz produkcję</a>
+        </div>
+      </article>
+
+      <aside class="hero-side">
+        <article class="card">
+          <img class="showcase-image" src="../images/produkcja.png" alt="Produkcja kamizelek kuloodpornych" />
+        </article>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+            <div class="stat-value" id="stat-products">9</div>
+            <div class="stat-label">Produktów</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-icon"><i class="fas fa-industry"></i></div>
+            <div class="stat-value">5</div>
+            <div class="stat-label">Etapów craftu</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Minigry live</div>
+          </article>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="shop-section" data-section="shop">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Sklep</h2>
+          <p class="section-subtitle">Kup gotowe produkty albo wyprodukuj je samodzielnie.</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-side">
+          <label class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="shopSearch" placeholder="Szukaj produktu..." maxlength="60" />
+          </label>
+          <label class="select-box">
+            <i class="fas fa-filter"></i>
+            <select id="shopFilter">
+              <option value="all">Wszystkie typy</option>
+              <option value="vest">Kamizelki</option>
+              <option value="accessory">Akcesoria</option>
+              <option value="special">Specjalne</option>
+            </select>
+          </label>
+          <label class="select-box">
+            <i class="fas fa-arrow-down-wide-short"></i>
+            <select id="shopSort">
+              <option value="name-asc">Nazwa A-Z</option>
+              <option value="price-asc">Cena rosnąco</option>
+              <option value="price-desc">Cena malejąco</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="toolbar-side">
+          <button class="ghost-btn" type="button" id="openInventoryBtn"><i class="fas fa-boxes-stacked"></i> Ekwipunek</button>
+          <button class="ghost-btn" type="button" id="refreshShopBtn"><i class="fas fa-rotate"></i> Odśwież</button>
+        </div>
+      </div>
+
+      <div class="products-grid" id="shop-products"></div>
+    </section>
+
+    <section class="section hidden" id="production-section" data-section="production">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Produkcja</h2>
+          <p class="section-subtitle">Rozpoczynaj etapy, kończ minigry i odbieraj gotowe produkty.</p>
+        </div>
+      </div>
+
+      <div class="production-panel" id="production-panel"></div>
+
+      <div class="resources-controls">
+        <button class="filter-btn" type="button" id="addResourcesBtn"><i class="fas fa-plus"></i> Dodaj zasoby testowe</button>
+        <button class="filter-btn" type="button" id="dailyPackBtn"><i class="fas fa-gift"></i> Pakiet dzienny</button>
+        <button class="filter-btn" type="button" id="resetGameBtn" style="color:var(--red);border-color:rgba(255,83,120,.3);"><i class="fas fa-trash"></i> Reset gry</button>
+      </div>
+
+      <div class="resources-panel" id="resources-panel"></div>
+      <div class="production-flow" id="production-flow"></div>
+      <div class="workstations" id="workstations"></div>
+
+      <div class="category-row" id="category-filters"></div>
+
+      <div class="products-grid" id="production-grid"></div>
+    </section>
+
+    <section class="section hidden" id="games-section" data-section="games">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Minigry</h2>
+          <p class="section-subtitle">Tutaj możesz trenować minigry zanim użyjesz ich podczas craftu.</p>
+        </div>
+      </div>
+
+      <div class="products-grid">
+        <article class="recipe-card">
+          <div class="product-name">Memory symboli</div>
+          <div class="product-desc" style="margin-top:10px;">Znajdź wszystkie pary. Dobra do lżejszych etapów.</div>
+          <div style="margin-top:16px;">
+            <button class="craft-btn" type="button" onclick="openStandaloneMinigame('memory')">Uruchom</button>
+          </div>
+        </article>
+
+        <article class="recipe-card">
+          <div class="product-name">Sekwencja kodów</div>
+          <div class="product-desc" style="margin-top:10px;">Zapamiętaj kolejność i odtwórz ją poprawnie.</div>
+          <div style="margin-top:16px;">
+            <button class="craft-btn" type="button" onclick="openStandaloneMinigame('sequence')">Uruchom</button>
+          </div>
+        </article>
+
+        <article class="recipe-card">
+          <div class="product-name">Łączenie przewodów</div>
+          <div class="product-desc" style="margin-top:10px;">Połącz właściwe pary modułów.</div>
+          <div style="margin-top:16px;">
+            <button class="craft-btn" type="button" onclick="openStandaloneMinigame('wires')">Uruchom</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Ekwipunek</h2>
+          <p class="section-subtitle">Tu zapisują się gotowe produkty.</p>
+        </div>
+      </div>
+
+      <div class="inventory-grid" id="inventoryGrid"></div>
+    </section>
+  </div>
+
+  <button class="chat-fab" type="button" id="chatFab" aria-label="Czat">
+    <i class="fas fa-comments"></i>
+  </button>
+
+  <div class="chat-modal" id="chatModal">
+    <div class="chat-header">
+      <span><i class="fas fa-headset"></i> Obsługa ARMOR</span>
+      <button class="chat-close" type="button" id="chatClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message system"><i class="fas fa-info-circle"></i> Witaj! Jak możemy pomóc?</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" maxlength="500" placeholder="Napisz wiadomość..." />
+      <button class="chat-send" type="button" id="chatSend"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <div class="overlay" id="purchaseOverlay">
+    <div class="modal-card">
+      <button class="modal-close" type="button" onclick="closePurchaseModal()"><i class="fas fa-xmark"></i></button>
+      <h3 class="modal-title">Zamówienie produktu</h3>
+      <p class="modal-text">Złóż zamówienie. Działa lokalnie, bez backendu.</p>
+
+      <div class="modal-grid">
+        <div class="modal-field full">
+          <label>Produkt</label>
+          <input type="text" id="purchaseProductName" readonly />
+        </div>
+        <div class="modal-field">
+          <label>Imię i nazwisko</label>
+          <input type="text" id="buyerName" placeholder="Np. Jan Kowalski" maxlength="80" />
+        </div>
+        <div class="modal-field">
+          <label>Numer IC</label>
+          <input type="text" id="buyerIC" placeholder="Np. 1284" maxlength="40" />
+        </div>
+        <div class="modal-field">
+          <label>Ilość</label>
+          <input type="number" id="purchaseQty" min="1" max="20" value="1" />
+        </div>
+        <div class="modal-field">
+          <label>Kod rabatowy</label>
+          <input type="text" id="discountCode" placeholder="ARMOR10 / ARMOR20" maxlength="30" />
+        </div>
+      </div>
+
+      <div class="discount-preview" id="discountPreview">
+        <span class="discount-badge" id="discountBadge"></span>
+        <span class="discount-value" id="discountValue"></span>
+      </div>
+
+      <div class="modal-summary">
+        <div class="modal-summary-row"><span>Cena bazowa</span><strong id="summaryBase">0 $</strong></div>
+        <div class="modal-summary-row"><span>Rabat</span><strong id="summaryDiscount">—</strong></div>
+        <div class="modal-summary-row"><span>Razem</span><strong id="summaryTotal">0 $</strong></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn" type="button" onclick="closePurchaseModal()">Anuluj</button>
+        <button class="modal-btn primary" type="button" onclick="confirmPurchase()">Zamów</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="inventoryOverlay">
+    <div class="modal-card">
+      <button class="modal-close" type="button" onclick="closeInventoryModal()"><i class="fas fa-xmark"></i></button>
+      <h3 class="modal-title">Magazyn użytkownika</h3>
+      <p class="modal-text">Tutaj widać wszystkie wyprodukowane lub kupione przedmioty.</p>
+      <div class="inventory-grid" id="inventoryModalGrid"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="successOverlay">
+    <div class="modal-card" style="text-align:center;">
+      <button class="modal-close" type="button" onclick="closeSuccessModal()"><i class="fas fa-xmark"></i></button>
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h3 class="modal-title">Sukces</h3>
+      <p class="modal-text" id="successText">Operacja zakończona pomyślnie.</p>
+      <div class="modal-actions" style="justify-content:center;margin-top:10px;">
+        <button class="modal-btn primary" type="button" onclick="closeSuccessModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="gameOverlay">
+    <div class="modal-card">
+      <button class="modal-close" type="button" onclick="closeGameOverlay()"><i class="fas fa-xmark"></i></button>
+      <h3 class="modal-title" id="gameModalTitle">Minigra</h3>
+      <p class="modal-text" id="gameModalText">Ukończ minigrę, aby zakończyć etap.</p>
+      <div id="gameContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const DISCOUNT_CODES = {
+      ARMOR10: 10,
+      ARMOR20: 20,
+      ARMOR30: 30
+    };
+
+    const categories = [
+      { id: 'all', name: 'Wszystkie', icon: 'fa-layer-group' },
+      { id: 'vests', name: 'Kamizelki', icon: 'fa-shield-halved' },
+      { id: 'magazines', name: 'Magazynki', icon: 'fa-box' },
+      { id: 'lights', name: 'Oświetlenie', icon: 'fa-lightbulb' },
+      { id: 'holsters', name: 'Kabury', icon: 'fa-gun' },
+      { id: 'paint', name: 'Malowania', icon: 'fa-paint-brush' }
+    ];
+
+    const workstations = {
+      material: { name: 'Warsztat Materiałowy', icon: 'fa-boxes', desc: 'Surowce' },
+      metal: { name: 'Warsztat Metalowy', icon: 'fa-industry', desc: 'Obróbka' },
+      polymer: { name: 'Warsztat Polimerowy', icon: 'fa-vial', desc: 'Polimery' },
+      assembly: { name: 'Stół Montażowy', icon: 'fa-wrench', desc: 'Montaż' },
+      paint: { name: 'Lakiernia', icon: 'fa-spray-can', desc: 'Wykończenie' }
+    };
+
+    const productionData = {
+      vest35: {
+        id: 'vest35', name: 'Kamizelka 35%', desc: 'Podstawowa ochrona balistyczna',
+        image: '../images/Kamizelka35.png', price: 10000, difficulty: 'Łatwy', type: 'vest', category: 'vests',
+        game: 'memory',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 15, inputs: { 'włókno techniczne': 4, 'kevlar surowy': 2, 'stal surowa': 1 }, outputs: { 'pakiet surowców lekkich': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'polymer', duration: 18, inputs: { 'pakiet surowców lekkich': 1 }, outputs: { 'tkanina balistyczna': 2, 'arkusz kevlaru': 1, 'płyta ochronna lekka': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'metal', duration: 16, inputs: { 'tkanina balistyczna': 2, 'arkusz kevlaru': 1 }, outputs: { 'panel przedni lekki': 1, 'panel tylny lekki': 1, 'pas mocujący': 2 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 20, inputs: { 'panel przedni lekki': 1, 'panel tylny lekki': 1, 'pas mocujący': 2 }, outputs: { 'szkielet kamizelki lekkiej': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 10, inputs: { 'szkielet kamizelki lekkiej': 1, 'płyta ochronna lekka': 1 }, outputs: { 'Kamizelka 35%': 1 } }
+        ]
+      },
+      vest50: {
+        id: 'vest50', name: 'Kamizelka 50%', desc: 'Średnia ochrona balistyczna',
+        image: '../images/Kamizelka50.png', price: 20000, difficulty: 'Średni', type: 'vest', category: 'vests',
+        game: 'sequence',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 20, inputs: { 'włókno techniczne': 5, 'kevlar surowy': 4, 'stal surowa': 2, 'polimer': 2 }, outputs: { 'pakiet surowców standard': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'polymer', duration: 25, inputs: { 'pakiet surowców standard': 1 }, outputs: { 'tkanina balistyczna': 2, 'arkusz kevlaru': 2, 'płyta balistyczna standard': 2, 'klamry montażowe': 2 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'metal', duration: 22, inputs: { 'tkanina balistyczna': 2, 'arkusz kevlaru': 2, 'klamry montażowe': 2 }, outputs: { 'panel przedni standard': 1, 'panel tylny standard': 1, 'pasy boczne': 2, 'uchwyty taktyczne': 2 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 28, inputs: { 'panel przedni standard': 1, 'panel tylny standard': 1, 'pasy boczne': 2, 'uchwyty taktyczne': 2 }, outputs: { 'korpus kamizelki standard': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 15, inputs: { 'korpus kamizelki standard': 1, 'płyta balistyczna standard': 2 }, outputs: { 'Kamizelka 50%': 1 } }
+        ]
+      },
+      vest75: {
+        id: 'vest75', name: 'Kamizelka 75%', desc: 'Wysoka ochrona balistyczna',
+        image: '../images/Kamizelka75.png', price: 35000, difficulty: 'Trudny', type: 'vest', category: 'vests',
+        game: 'wires',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 25, inputs: { 'włókno techniczne': 6, 'kevlar surowy': 6, 'stal surowa': 3, 'polimer': 3, 'aluminium surowe': 2 }, outputs: { 'pakiet surowców ciężkich': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'polymer', duration: 30, inputs: { 'pakiet surowców ciężkich': 1 }, outputs: { 'tkanina balistyczna premium': 2, 'arkusz kevlaru premium': 3, 'płyta balistyczna ciężka': 3, 'szyny MOLLE': 2 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'metal', duration: 28, inputs: { 'tkanina balistyczna premium': 2, 'arkusz kevlaru premium': 3, 'szyny MOLLE': 2 }, outputs: { 'panel przedni ciężki': 1, 'panel tylny ciężki': 1, 'system boczny': 2, 'moduł taktyczny MOLLE': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 35, inputs: { 'panel przedni ciężki': 1, 'panel tylny ciężki': 1, 'system boczny': 2 }, outputs: { 'korpus kamizelki ciężkiej': 1, 'wkład ochronny ciężki': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 18, inputs: { 'korpus kamizelki ciężkiej': 1, 'wkład ochronny ciężki': 1, 'moduł taktyczny MOLLE': 1 }, outputs: { 'Kamizelka 75%': 1 } }
+        ]
+      },
+      latarka: {
+        id: 'latarka', name: 'Latarka do broni', desc: 'Latarka taktyczna',
+        image: '../images/latarka_broń.png', price: 25000, difficulty: 'Średni', type: 'accessory', category: 'lights',
+        game: 'sequence',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 20, inputs: { 'aluminium surowe': 2, 'szkło techniczne': 1, 'ogniwo zasilające': 2, 'polimer': 1 }, outputs: { 'pakiet oświetlenia taktycznego': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'metal', duration: 25, inputs: { 'pakiet oświetlenia taktycznego': 1 }, outputs: { 'obudowa latarki': 1, 'soczewka': 1, 'bateria robocza': 1, 'uchwyt montażowy': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'polymer', duration: 22, inputs: { 'obudowa latarki': 1, 'soczewka': 1, 'bateria robocza': 1 }, outputs: { 'głowica światła': 1, 'moduł zasilania': 1, 'mocowanie do szyny': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 28, inputs: { 'głowica światła': 1, 'moduł zasilania': 1, 'mocowanie do szyny': 1 }, outputs: { 'moduł latarki broniowej': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 15, inputs: { 'moduł latarki broniowej': 1, 'uchwyt montażowy': 1 }, outputs: { 'Latarka do broni': 1 } }
+        ]
+      },
+      latarka_reczna: {
+        id: 'latarka_reczna', name: 'Latarka ręczna', desc: 'Latarka LED',
+        image: '../images/Latarka.png', price: 50000, difficulty: 'Łatwy', type: 'accessory', category: 'lights',
+        game: 'memory',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 15, inputs: { 'aluminium surowe': 2, 'szkło techniczne': 1, 'ogniwo zasilające': 2, 'polimer': 1 }, outputs: { 'pakiet oświetlenia ręcznego': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'metal', duration: 18, inputs: { 'pakiet oświetlenia ręcznego': 1 }, outputs: { 'obudowa ręczna': 1, 'soczewka': 1, 'bateria robocza': 1, 'przycisk zasilania': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'polymer', duration: 16, inputs: { 'obudowa ręczna': 1, 'soczewka': 1, 'bateria robocza': 1 }, outputs: { 'głowica latarki': 1, 'moduł zasilania': 1, 'rękojeść': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 20, inputs: { 'głowica latarki': 1, 'moduł zasilania': 1, 'rękojeść': 1 }, outputs: { 'korpus latarki': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 10, inputs: { 'korpus latarki': 1 }, outputs: { 'Latarka ręczna': 1 } }
+        ]
+      },
+      kabura: {
+        id: 'kabura', name: 'Kabura', desc: 'Kabura na broń',
+        image: '../images/Kabura.png', price: 250000, difficulty: 'Elite', type: 'accessory', category: 'holsters',
+        game: 'wires',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 25, inputs: { 'skóra techniczna': 4, 'polimer': 2, 'aluminium surowe': 1 }, outputs: { 'pakiet kabury': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'polymer', duration: 30, inputs: { 'pakiet kabury': 1 }, outputs: { 'formowana skóra': 2, 'korpus polimerowy': 1, 'klips montażowy': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'metal', duration: 28, inputs: { 'formowana skóra': 2, 'korpus polimerowy': 1 }, outputs: { 'osłona kabury': 1, 'mocowanie pasa': 1, 'blokada kabury': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 35, inputs: { 'osłona kabury': 1, 'mocowanie pasa': 1, 'blokada kabury': 1 }, outputs: { 'korpus kabury': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 18, inputs: { 'korpus kabury': 1, 'klips montażowy': 1 }, outputs: { 'Kabura': 1 } }
+        ]
+      },
+      mag_pistolet: {
+        id: 'mag_pistolet', name: 'Magazynek do pistoletu', desc: 'Standardowy magazynek',
+        image: '../images/magazynek_pistolet.png', price: 3800, difficulty: 'Łatwy', type: 'accessory', category: 'magazines',
+        game: 'memory',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 15, inputs: { 'stal surowa': 2, 'polimer': 1 }, outputs: { 'pakiet magazynka standard': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'metal', duration: 18, inputs: { 'pakiet magazynka standard': 1 }, outputs: { 'korpus magazynka': 1, 'sprężyna': 1, 'podajnik': 1, 'stopka magazynka': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'polymer', duration: 16, inputs: { 'korpus magazynka': 1, 'sprężyna': 1, 'podajnik': 1 }, outputs: { 'moduł wewnętrzny magazynka': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 20, inputs: { 'moduł wewnętrzny magazynka': 1, 'stopka magazynka': 1 }, outputs: { 'mechanizm magazynka': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 10, inputs: { 'mechanizm magazynka': 1 }, outputs: { 'Magazynek do pistoletu': 1 } }
+        ]
+      },
+      magazynek: {
+        id: 'magazynek', name: 'Powiększony magazynek', desc: 'Większa pojemność',
+        image: '../images/Pow_magazynek.png', price: 60000, difficulty: 'Średni', type: 'accessory', category: 'magazines',
+        game: 'sequence',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 20, inputs: { 'stal surowa': 3, 'polimer': 2, 'aluminium surowe': 1 }, outputs: { 'pakiet magazynka rozszerzonego': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'metal', duration: 25, inputs: { 'pakiet magazynka rozszerzonego': 1 }, outputs: { 'wydłużony korpus magazynka': 1, 'sprężyna wzmocniona': 1, 'rozszerzona stopka': 1, 'adapter montażowy': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'polymer', duration: 22, inputs: { 'wydłużony korpus magazynka': 1, 'sprężyna wzmocniona': 1, 'adapter montażowy': 1 }, outputs: { 'moduł dużej pojemności': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 28, inputs: { 'moduł dużej pojemności': 1, 'rozszerzona stopka': 1 }, outputs: { 'mechanizm magazynka premium': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 15, inputs: { 'mechanizm magazynka premium': 1 }, outputs: { 'Powiększony magazynek': 1 } }
+        ]
+      },
+      zlote: {
+        id: 'zlote', name: 'Złote malowanie', desc: 'Złoty wygląd broni',
+        image: '../images/Złote_malowanie.png', price: 280000, difficulty: 'Elite', type: 'special', category: 'paint',
+        game: 'wires',
+        stages: [
+          { id: 1, name: 'ZBIERANIE', icon: 'fa-hand-holding', workstation: 'material', duration: 25, inputs: { 'chemikalia przemysłowe': 2, 'pigment premium': 2, 'aluminium surowe': 1, 'szkło techniczne': 1 }, outputs: { 'pakiet lakierniczy premium': 1 } },
+          { id: 2, name: 'PRZERÓBKA', icon: 'fa-cogs', workstation: 'polymer', duration: 30, inputs: { 'pakiet lakierniczy premium': 1 }, outputs: { 'baza lakiernicza': 1, 'mieszanka pigmentu': 1, 'utwardzacz': 1, 'aplikator natryskowy': 1 } },
+          { id: 3, name: 'CZĘŚCI', icon: 'fa-tools', workstation: 'metal', duration: 28, inputs: { 'baza lakiernicza': 1, 'mieszanka pigmentu': 1, 'utwardzacz': 1 }, outputs: { 'zestaw lakierniczy premium': 1, 'warstwa podkładowa': 1 } },
+          { id: 4, name: 'MONTAŻ', icon: 'fa-hammer', workstation: 'assembly', duration: 35, inputs: { 'zestaw lakierniczy premium': 1, 'warstwa podkładowa': 1, 'aplikator natryskowy': 1 }, outputs: { 'pakiet malowania dekoracyjnego': 1 } },
+          { id: 5, name: 'FINALIZACJA', icon: 'fa-check-circle', workstation: 'paint', duration: 18, inputs: { 'pakiet malowania dekoracyjnego': 1 }, outputs: { 'Złote malowanie': 1 } }
+        ]
+      }
+    };
+
+    let resources = {
+      'włókno techniczne': 50,
+      'kevlar surowy': 30,
+      'stal surowa': 25,
+      'polimer': 20,
+      'aluminium surowe': 15,
+      'szkło techniczne': 10,
+      'ogniwo zasilające': 10,
+      'skóra techniczna': 8,
+      'chemikalia przemysłowe': 5,
+      'pigment premium': 5
+    };
+
+    let inventory = {};
+    let productionProgress = {};
+    let currentTab = 'shop';
+    let selectedCategory = 'all';
+    let currentPurchaseProduct = null;
+    let activeGame = null;
+    let standaloneGameMode = false;
+
+    function saveGame() {
+      localStorage.setItem('armor_resources', JSON.stringify(resources));
+      localStorage.setItem('armor_inventory', JSON.stringify(inventory));
+      localStorage.setItem('armor_progress', JSON.stringify(productionProgress));
+      localStorage.setItem('armor_tab', currentTab);
+      localStorage.setItem('armor_category', selectedCategory);
+    }
+
+    function loadGame() {
+      try {
+        const savedResources = JSON.parse(localStorage.getItem('armor_resources') || 'null');
+        const savedInventory = JSON.parse(localStorage.getItem('armor_inventory') || 'null');
+        const savedProgress = JSON.parse(localStorage.getItem('armor_progress') || 'null');
+        const savedTab = localStorage.getItem('armor_tab');
+        const savedCategory = localStorage.getItem('armor_category');
+
+        if (savedResources) resources = savedResources;
+        if (savedInventory) inventory = savedInventory;
+        if (savedProgress) productionProgress = savedProgress;
+        if (savedTab) currentTab = savedTab;
+        if (savedCategory) selectedCategory = savedCategory;
+      } catch (e) {
+        console.log('Load error', e);
+      }
+    }
+
+    function formatPrice(v) {
+      return Number(v || 0).toLocaleString('pl-PL') + ' $';
+    }
+
+    function showToast(title, message, type = 'info') {
+      const el = document.createElement('div');
+      const colors = {
+        success: 'rgba(61,255,173,.18)',
+        error: 'rgba(255,83,120,.18)',
+        info: 'rgba(0,234,255,.18)',
+        warning: 'rgba(255,174,66,.18)'
+      };
+      el.style.position = 'fixed';
+      el.style.top = '20px';
+      el.style.right = '20px';
+      el.style.zIndex = '120';
+      el.style.minWidth = '280px';
+      el.style.maxWidth = '380px';
+      el.style.padding = '14px 16px';
+      el.style.borderRadius = '14px';
+      el.style.background = colors[type] || colors.info;
+      el.style.border = '1px solid rgba(255,255,255,.08)';
+      el.style.backdropFilter = 'blur(12px)';
+      el.style.boxShadow = '0 18px 40px rgba(0,0,0,.32)';
+      el.innerHTML = `<div style="font-family:Orbitron,sans-serif;font-size:.82rem;margin-bottom:4px;">${title}</div><div style="color:rgba(236,250,255,.78);line-height:1.5;">${message}</div>`;
+      document.body.appendChild(el);
+      setTimeout(() => {
+        el.style.transition = '.25s';
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(40px)';
+        setTimeout(() => el.remove(), 250);
+      }, 3000);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+
+      document.getElementById('shop-section').classList.toggle('hidden', tab !== 'shop');
+      document.getElementById('production-section').classList.toggle('hidden', tab !== 'production');
+      document.getElementById('games-section').classList.toggle('hidden', tab !== 'games');
+
+      saveGame();
+    }
+
+    function initTabs() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+      switchTab(currentTab);
+    }
+
+    function initCategoryFilters() {
+      const wrap = document.getElementById('category-filters');
+      wrap.innerHTML = categories.map(cat => `
+        <button class="filter-btn ${cat.id === selectedCategory ? 'active' : ''}" type="button" data-category="${cat.id}">
+          <i class="fas ${cat.icon}"></i> ${cat.name}
+        </button>
+      `).join('');
+
+      wrap.querySelectorAll('[data-category]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedCategory = btn.dataset.category;
+          initCategoryFilters();
+          renderProductionProducts();
+          saveGame();
+        });
+      });
+    }
+
+    function getProductsArray() {
+      return Object.values(productionData);
+    }
+
+    function renderShopProducts() {
+      const grid = document.getElementById('shop-products');
+      let items = [...getProductsArray()];
+
+      const search = document.getElementById('shopSearch').value.trim().toLowerCase();
+      const filter = document.getElementById('shopFilter').value;
+      const sort = document.getElementById('shopSort').value;
+
+      if (search) {
+        items = items.filter(p =>
+          p.name.toLowerCase().includes(search) ||
+          p.desc.toLowerCase().includes(search)
+        );
+      }
+
+      if (filter !== 'all') items = items.filter(p => p.type === filter);
+
+      if (sort === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
+      if (sort === 'price-asc') items.sort((a,b) => a.price - b.price);
+      if (sort === 'price-desc') items.sort((a,b) => b.price - a.price);
+
+      if (!items.length) {
+        grid.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>Brak produktów.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(product => `
+        <article class="cennik-card">
+          <div class="product-image">
+            <img src="${product.image}" alt="${product.name}">
+          </div>
+          <div class="product-info">
+            <div class="product-name">${product.name}</div>
+            <div class="product-desc">${product.desc}</div>
+            <div class="inventory-badge">Na stanie: ${inventory[product.id] || 0}</div>
+            <div class="product-price">${formatPrice(product.price)}</div>
+          </div>
+          <div>
+            <button class="buy-btn" type="button" onclick="openPurchaseModal('${product.id}')">Kup</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderProductionPanel() {
+      let inProgress = 0;
+      let completed = 0;
+      let ready = 0;
+
+      Object.values(productionProgress).forEach(p => {
+        if (!p) return;
+        if (p.status === 'completed') completed++;
+        if (p.status === 'in_progress') inProgress++;
+      });
+
+      Object.values(inventory).forEach(v => ready += v || 0);
+
+      document.getElementById('production-panel').innerHTML = `
+        <div class="panel-stat">
+          <div class="panel-stat-icon"><i class="fas fa-cogs"></i></div>
+          <div class="panel-stat-value">${inProgress}</div>
+          <div class="panel-stat-label">W produkcji</div>
+        </div>
+        <div class="panel-stat">
+          <div class="panel-stat-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="panel-stat-value">${completed}</div>
+          <div class="panel-stat-label">Ukończone</div>
+        </div>
+        <div class="panel-stat">
+          <div class="panel-stat-icon"><i class="fas fa-boxes-stacked"></i></div>
+          <div class="panel-stat-value">${ready}</div>
+          <div class="panel-stat-label">W magazynie</div>
+        </div>
+      `;
+    }
+
+    function renderResources() {
+      const wrap = document.getElementById('resources-panel');
+      const entries = Object.entries(resources);
+      wrap.innerHTML = entries.map(([name, qty]) => `
+        <article class="resource-item ${qty < 3 ? 'low' : ''}">
+          <span class="resource-name">${name}</span>
+          <span class="resource-qty">x${qty}</span>
+        </article>
+      `).join('');
+    }
+
+    function renderWorkstations() {
+      document.getElementById('workstations').innerHTML = Object.values(workstations).map(ws => `
+        <article class="workstation-card">
+          <div class="workstation-icon"><i class="fas ${ws.icon}"></i></div>
+          <h3 class="workstation-name">${ws.name}</h3>
+          <p class="workstation-desc">${ws.desc}</p>
+          <div class="workstation-status">Gotowe do pracy</div>
+        </article>
+      `).join('');
+    }
+
+    function updateProductionFlow() {
+      const steps = [
+        { id:1, name:'Surowce', icon:'fa-cubes' },
+        { id:2, name:'Przeróbka', icon:'fa-cogs' },
+        { id:3, name:'Części', icon:'fa-tools' },
+        { id:4, name:'Montaż', icon:'fa-hammer' },
+        { id:5, name:'Produkt', icon:'fa-check-circle' }
+      ];
+
+      let activeStage = 0;
+      Object.values(productionProgress).forEach(prog => {
+        if (prog?.status === 'in_progress') activeStage = Math.max(activeStage, prog.currentStage);
+      });
+
+      document.getElementById('production-flow').innerHTML = steps.map((step, idx) => {
+        let cls = '';
+        if (activeStage > step.id) cls = 'completed';
+        else if (activeStage === step.id) cls = 'active';
+
+        return `
+          <div class="flow-step ${cls}">
+            <div class="flow-icon"><i class="fas ${step.icon}"></i></div>
+            <div>${step.name}</div>
+          </div>
+          ${idx < steps.length - 1 ? '<div class="flow-arrow">→</div>' : ''}
+        `;
+      }).join('');
+    }
+
+    function canStartStage(stage) {
+      return Object.entries(stage.inputs).every(([key,val]) => (resources[key] || 0) >= val);
+    }
+
+    function consumeResources(inputs) {
+      Object.entries(inputs).forEach(([key,val]) => {
+        resources[key] = (resources[key] || 0) - val;
+      });
+    }
+
+    function addResources(outputs) {
+      Object.entries(outputs).forEach(([key,val]) => {
+        resources[key] = (resources[key] || 0) + val;
+      });
+    }
+
+    function renderStages(productId) {
+      const product = productionData[productId];
+      const prog = productionProgress[productId] || { currentStage:1, status:'not_started' };
+      const currentStageData = product.stages[(prog.currentStage || 1) - 1];
+      const isCompleted = prog.status === 'completed';
+
+      let headerBtn = '';
+      if (isCompleted) {
+        headerBtn = `
+          <div class="produce-section">
+            <button class="produce-btn completed-btn" type="button" onclick="event.stopPropagation(); collectFinishedProduct('${productId}')">
+              <i class="fas fa-box"></i> Odbierz produkt
+            </button>
+          </div>
+        `;
+      } else if (currentStageData && canStartStage(currentStageData)) {
+        headerBtn = `
+          <div class="produce-section">
+            <button class="produce-btn" type="button" onclick="event.stopPropagation(); startProduction('${productId}')">
+              <i class="fas fa-play"></i> Rozpocznij etap ${prog.currentStage || 1}
+            </button>
+          </div>
+        `;
+      } else {
+        headerBtn = `
+          <div class="produce-section">
+            <button class="produce-btn" type="button" disabled>
+              <i class="fas fa-lock"></i> Brak surowców
+            </button>
+          </div>
+        `;
+      }
+
+      return `
+        ${headerBtn}
+        <div class="stages-container">
+          ${product.stages.map((stage, idx) => {
+            let cls = 'locked';
+            if (prog.status === 'completed') cls = 'completed';
+            else if (idx + 1 < (prog.currentStage || 1)) cls = 'completed';
+            else if (idx + 1 === (prog.currentStage || 1)) cls = 'active';
+
+            const ws = workstations[stage.workstation];
+            return `
+              <article class="stage ${cls}">
+                <div class="stage-header">
+                  <div class="stage-number">${cls === 'completed' ? '✓' : stage.id}</div>
+                  <div class="stage-info">
+                    <div class="stage-name"><i class="fas ${stage.icon}"></i> ${stage.name}</div>
+                  </div>
+                  <div class="stage-workstation"><i class="fas ${ws.icon}"></i> ${ws.name}</div>
+                  ${cls === 'active' && !canStartStage(stage) ? `<div class="no-resources"><i class="fas fa-triangle-exclamation"></i> Brak</div>` : ''}
+                </div>
+                <div class="stage-body">
+                  <div class="stage-time"><i class="fas fa-clock"></i> ${stage.duration}s</div>
+                  <div class="stage-flow">
+                    <div class="stage-io inputs">
+                      <div class="io-label">Wejście</div>
+                      ${Object.entries(stage.inputs).map(([k,v]) => {
+                        const has = resources[k] || 0;
+                        const bad = has < v;
+                        return `<div class="io-item ${bad ? 'insufficient' : ''}"><span>${k}</span><span class="io-qty ${bad ? 'insufficient' : ''}">${has}/${v}</span></div>`;
+                      }).join('')}
+                    </div>
+                    <div class="stage-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="stage-io outputs">
+                      <div class="io-label">Wyjście</div>
+                      ${Object.entries(stage.outputs).map(([k,v]) => `<div class="io-item"><span>${k}</span><span class="io-qty">x${v}</span></div>`).join('')}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderProductionProducts() {
+      const grid = document.getElementById('production-grid');
+      let items = getProductsArray();
+
+      if (selectedCategory !== 'all') {
+        items = items.filter(p => p.category === selectedCategory);
+      }
+
+      if (!items.length) {
+        grid.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>Brak produktów w tej kategorii.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(product => {
+        const prog = productionProgress[product.id] || { currentStage:1, status:'not_started' };
+        const totalTime = product.stages.reduce((acc,s) => acc + s.duration, 0);
+        let statusText = 'Nie rozpoczęto';
+        let statusClass = 'not-started';
+
+        if (prog.status === 'completed') {
+          statusText = 'Gotowe do odbioru';
+          statusClass = 'completed';
+        } else if (prog.status === 'in_progress') {
+          statusText = `Etap ${prog.currentStage}/5`;
+          statusClass = 'in-progress';
+        }
+
+        return `
+          <article class="production-card" id="prod-card-${product.id}">
+            <div class="product-header" onclick="toggleProductCard('${product.id}')">
+              <div class="product-image-small">
+                <img src="${product.image}" alt="${product.name}">
+              </div>
+              <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-meta">
+                  <span class="difficulty difficulty-${product.difficulty.toLowerCase()}">${product.difficulty}</span>
+                  <span class="total-time"><i class="fas fa-clock"></i> ${totalTime}s</span>
+                  <span class="product-status ${statusClass}">${statusText}</span>
+                </div>
+              </div>
+              <div class="expand-icon"><i class="fas fa-chevron-down"></i></div>
+            </div>
+            <div class="product-body">
+              ${renderStages(product.id)}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderInventory() {
+      const wrap = document.getElementById('inventoryGrid');
+      const modalWrap = document.getElementById('inventoryModalGrid');
+      const entries = Object.entries(productionData)
+        .filter(([id]) => (inventory[id] || 0) > 0)
+        .map(([id,p]) => ({ id, ...p, qty: inventory[id] || 0 }));
+
+      const html = entries.length
+        ? entries.map(item => `
+          <article class="inventory-card">
+            <div class="inventory-top">
+              <div>
+                <div class="inventory-icon"><i class="fas fa-box"></i></div>
+                <h3 class="inventory-name">${item.name}</h3>
+              </div>
+              <div class="inventory-value">${item.qty}</div>
+            </div>
+            <p class="inventory-meta">${item.desc}</p>
+          </article>
+        `).join('')
+        : `<div class="empty-state"><i class="fas fa-box-open"></i><p>Brak produktów w magazynie.</p></div>`;
+
+      wrap.innerHTML = html;
+      modalWrap.innerHTML = html;
+    }
+
+    function toggleProductCard(productId) {
+      document.querySelectorAll('.production-card').forEach(card => {
+        if (card.id !== `prod-card-${productId}`) card.classList.remove('expanded');
+      });
+      const card = document.getElementById(`prod-card-${productId}`);
+      if (card) card.classList.toggle('expanded');
+    }
+
+    function collectFinishedProduct(productId) {
+      inventory[productId] = (inventory[productId] || 0) + 1;
+      productionProgress[productId] = { currentStage:1, status:'not_started' };
+      renderAll();
+      saveGame();
+      showToast('Produkcja zakończona', `Odebrano: ${productionData[productId].name}`, 'success');
+    }
+
+    function getGameTypeForProduct(product) {
+      return product.game || 'memory';
+    }
+
+    function startProduction(productId) {
+      const product = productionData[productId];
+      const prog = productionProgress[productId] || { currentStage:1, status:'not_started' };
+      const stage = product.stages[(prog.currentStage || 1) - 1];
+
+      if (!stage) return;
+      if (!canStartStage(stage)) {
+        showToast('Brak zasobów', 'Nie masz materiałów do tego etapu.', 'error');
+        return;
+      }
+
+      openCraftMinigame(productId, prog.currentStage || 1, getGameTypeForProduct(product), stage);
+    }
+
+    function openStandaloneMinigame(type) {
+      standaloneGameMode = true;
+      openGameOverlay(type, null, null, true);
+    }
+
+    function openCraftMinigame(productId, stageNum, type, stage) {
+      standaloneGameMode = false;
+      openGameOverlay(type, productId, stageNum, false, stage);
+    }
+
+    function closeGameOverlay() {
+      activeGame = null;
+      document.getElementById('gameOverlay').classList.remove('show');
+      document.getElementById('gameContent').innerHTML = '';
+    }
+
+    function finishCraftStage(success, productId, stageNum) {
+      if (standaloneGameMode || !productId) return;
+
+      const product = productionData[productId];
+      const stage = product.stages[stageNum - 1];
+      if (!stage) return;
+
+      if (success) {
+        consumeResources(stage.inputs);
+        addResources(stage.outputs);
+
+        const prog = productionProgress[productId] || { currentStage:1, status:'not_started' };
+        if (stageNum >= product.stages.length) {
+          prog.status = 'completed';
+          prog.currentStage = product.stages.length;
+        } else {
+          prog.status = 'in_progress';
+          prog.currentStage = stageNum + 1;
+        }
+        productionProgress[productId] = prog;
+
+        showToast('Sukces', `Etap ${stageNum} ukończony: ${product.name}`, 'success');
+      } else {
+        showToast('Porażka', `Etap ${stageNum} nie został ukończony.`, 'error');
+      }
+
+      closeGameOverlay();
+      renderAll();
+      saveGame();
+    }
+
+    function openGameOverlay(type, productId = null, stageNum = null, standalone = false, stage = null) {
+      const overlay = document.getElementById('gameOverlay');
+      const content = document.getElementById('gameContent');
+      const title = document.getElementById('gameModalTitle');
+      const text = document.getElementById('gameModalText');
+
+      overlay.classList.add('show');
+
+      if (type === 'memory') {
+        title.textContent = 'Memory symboli';
+        text.textContent = standalone
+          ? 'Znajdź wszystkie pary.'
+          : 'Znajdź wszystkie pary, aby zaliczyć etap.';
+        startMemoryGame(content, productId, stageNum);
+      }
+
+      if (type === 'sequence') {
+        title.textContent = 'Sekwencja kodów';
+        text.textContent = standalone
+          ? 'Zapamiętaj kolejność i odtwórz ją.'
+          : 'Odtwórz poprawną sekwencję, aby zaliczyć etap.';
+        startSequenceGame(content, productId, stageNum);
+      }
+
+      if (type === 'wires') {
+        title.textContent = 'Łączenie przewodów';
+        text.textContent = standalone
+          ? 'Połącz poprawne moduły.'
+          : 'Połącz wszystkie poprawne pary, aby zaliczyć etap.';
+        startWiresGame(content, productId, stageNum);
+      }
+    }
+
+    function startMemoryGame(container, productId, stageNum) {
+      const symbols = ['⚙','⬢','◈','⛭'];
+      let board = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+      let first = null;
+      let second = null;
+      let lock = false;
+      let done = 0;
+      let timeLeft = 40;
+      let interval = null;
+
+      container.innerHTML = `
+        <div class="game-box">
+          <div class="game-head">
+            <div class="game-title">Znajdź 4 pary</div>
+            <div class="game-timer">Czas: <span id="gameTimer">${timeLeft}</span>s</div>
+          </div>
+          <div class="memory-grid" id="memoryGrid"></div>
+        </div>
+      `;
+
+      const grid = container.querySelector('#memoryGrid');
+      grid.innerHTML = board.map((sym, idx) => `
+        <button class="memory-card" type="button" data-idx="${idx}">?</button>
+      `).join('');
+
+      function reveal(btn, sym) {
+        btn.textContent = sym;
+        btn.classList.add('revealed');
+      }
+
+      function hide(btn) {
+        btn.textContent = '?';
+        btn.classList.remove('revealed');
+      }
+
+      function win() {
+        clearInterval(interval);
+        if (productId) finishCraftStage(true, productId, stageNum);
+        else {
+          showToast('Sukces', 'Ukończyłeś memory.', 'success');
+          closeGameOverlay();
+        }
+      }
+
+      function lose() {
+        clearInterval(interval);
+        if (productId) finishCraftStage(false, productId, stageNum);
+        else {
+          showToast('Porażka', 'Czas minął.', 'error');
+          closeGameOverlay();
+        }
+      }
+
+      interval = setInterval(() => {
+        timeLeft--;
+        const timer = document.getElementById('gameTimer');
+        if (timer) timer.textContent = timeLeft;
+        if (timeLeft <= 0) lose();
+      }, 1000);
+
+      grid.querySelectorAll('.memory-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (lock) return;
+          if (btn.classList.contains('done') || btn.classList.contains('revealed')) return;
+
+          const idx = Number(btn.dataset.idx);
+          reveal(btn, board[idx]);
+
+          if (!first) {
+            first = { btn, value: board[idx] };
+            return;
+          }
+
+          second = { btn, value: board[idx] };
+          lock = true;
+
+          if (first.value === second.value) {
+            first.btn.classList.add('done');
+            second.btn.classList.add('done');
+            done += 2;
+            first = null;
+            second = null;
+            lock = false;
+            if (done === board.length) win();
+          } else {
+            setTimeout(() => {
+              hide(first.btn);
+              hide(second.btn);
+              first = null;
+              second = null;
+              lock = false;
+            }, 700);
+          }
+        });
+      });
+    }
+
+    function startSequenceGame(container, productId, stageNum) {
+      const pool = ['A1', 'B2', 'C3', 'D4', 'E5', 'F6'];
+      const sequence = [];
+      while (sequence.length < 4) {
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        if (!sequence.includes(pick)) sequence.push(pick);
+      }
+
+      let player = [];
+      let timeLeft = 28;
+      let showTime = 3;
+      let playing = false;
+      let interval;
+
+      container.innerHTML = `
+        <div class="game-box">
+          <div class="game-head">
+            <div class="game-title">Zapamiętaj kolejność</div>
+            <div class="game-timer">Czas: <span id="seqTimer">${timeLeft}</span>s</div>
+          </div>
+
+          <div class="sequence-display" id="sequenceDisplay">
+            ${sequence.map(v => `<div class="sequence-pill">${v}</div>`).join('')}
+          </div>
+
+          <div class="sequence-inputs hidden" id="sequenceInputs">
+            ${pool.map(v => `<button class="sequence-btn" type="button" data-val="${v}">${v}</button>`).join('')}
+          </div>
+
+          <div style="margin-top:14px;color:var(--muted);text-align:center;" id="sequenceInfo">
+            Zapamiętaj układ...
+          </div>
+        </div>
+      `;
+
+      const display = container.querySelector('#sequenceDisplay');
+      const inputs = container.querySelector('#sequenceInputs');
+      const info = container.querySelector('#sequenceInfo');
+
+      const revealInterval = setInterval(() => {
+        showTime--;
+        info.textContent = `Zapamiętaj układ... ${showTime}`;
+        if (showTime <= 0) {
+          clearInterval(revealInterval);
+          display.classList.add('hidden');
+          inputs.classList.remove('hidden');
+          info.textContent = 'Kliknij w poprawnej kolejności.';
+          playing = true;
+        }
+      }, 1000);
+
+      function win() {
+        clearInterval(interval);
+        if (productId) finishCraftStage(true, productId, stageNum);
+        else {
+          showToast('Sukces', 'Poprawna sekwencja.', 'success');
+          closeGameOverlay();
+        }
+      }
+
+      function lose(msg = 'Zła kolejność.') {
+        clearInterval(interval);
+        if (productId) finishCraftStage(false, productId, stageNum);
+        else {
+          showToast('Porażka', msg, 'error');
+          closeGameOverlay();
+        }
+      }
+
+      interval = setInterval(() => {
+        timeLeft--;
+        const timer = document.getElementById('seqTimer');
+        if (timer) timer.textContent = timeLeft;
+        if (timeLeft <= 0) lose('Czas minął.');
+      }, 1000);
+
+      inputs.querySelectorAll('.sequence-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!playing) return;
+          const value = btn.dataset.val;
+          const expected = sequence[player.length];
+          player.push(value);
+
+          if (value !== expected) {
+            lose('Pomyliłeś kolejność.');
+            return;
+          }
+
+          btn.disabled = true;
+          btn.style.opacity = '.45';
+
+          if (player.length === sequence.length) {
+            win();
+          }
+        });
+      });
+    }
+
+    function startWiresGame(container, productId, stageNum) {
+      const left = ['A1', 'B2', 'C3'];
+      const mapping = { A1: 'MOD-X', B2: 'MOD-Y', C3: 'MOD-Z' };
+      const right = ['MOD-X', 'MOD-Z', 'MOD-Y'];
+
+      let selectedLeft = null;
+      let selectedRight = null;
+      let matched = 0;
+      let timeLeft = 30;
+      let interval;
+
+      container.innerHTML = `
+        <div class="game-box">
+          <div class="game-head">
+            <div class="game-title">Połącz poprawne pary</div>
+            <div class="game-timer">Czas: <span id="wiresTimer">${timeLeft}</span>s</div>
+          </div>
+
+          <div class="wires-grid">
+            <div class="wire-column" id="wireLeft">
+              ${left.map(v => `<button class="wire-node" type="button" data-side="left" data-val="${v}">${v}</button>`).join('')}
+            </div>
+            <div class="wire-column" id="wireRight">
+              ${right.map(v => `<button class="wire-node" type="button" data-side="right" data-val="${v}">${v}</button>`).join('')}
+            </div>
+          </div>
+
+          <div style="margin-top:14px;color:var(--muted);text-align:center;" id="wireInfo">
+            Wybierz lewy i prawy moduł.
+          </div>
+        </div>
+      `;
+
+      const allNodes = container.querySelectorAll('.wire-node');
+
+      function resetSelection() {
+        selectedLeft = null;
+        selectedRight = null;
+        allNodes.forEach(n => n.classList.remove('selected'));
+      }
+
+      function win() {
+        clearInterval(interval);
+        if (productId) finishCraftStage(true, productId, stageNum);
+        else {
+          showToast('Sukces', 'Wszystkie przewody połączone.', 'success');
+          closeGameOverlay();
+        }
+      }
+
+      function lose(msg = 'Porażka.') {
+        clearInterval(interval);
+        if (productId) finishCraftStage(false, productId, stageNum);
+        else {
+          showToast('Porażka', msg, 'error');
+          closeGameOverlay();
+        }
+      }
+
+      function tryMatch() {
+        if (!selectedLeft || !selectedRight) return;
+        const good = mapping[selectedLeft.dataset.val] === selectedRight.dataset.val;
+
+        if (good) {
+          selectedLeft.classList.remove('selected');
+          selectedRight.classList.remove('selected');
+          selectedLeft.classList.add('matched');
+          selectedRight.classList.add('matched');
+          selectedLeft.disabled = true;
+          selectedRight.disabled = true;
+          matched++;
+          resetSelection();
+
+          if (matched === 3) win();
+        } else {
+          document.getElementById('wireInfo').textContent = 'Zła para — spróbuj jeszcze raz.';
+          setTimeout(() => {
+            document.getElementById('wireInfo').textContent = 'Wybierz lewy i prawy moduł.';
+            resetSelection();
+          }, 500);
+        }
+      }
+
+      interval = setInterval(() => {
+        timeLeft--;
+        const timer = document.getElementById('wiresTimer');
+        if (timer) timer.textContent = timeLeft;
+        if (timeLeft <= 0) lose('Czas minął.');
+      }, 1000);
+
+      allNodes.forEach(node => {
+        node.addEventListener('click', () => {
+          if (node.classList.contains('matched')) return;
+
+          if (node.dataset.side === 'left') {
+            if (selectedLeft) selectedLeft.classList.remove('selected');
+            selectedLeft = node;
+            node.classList.add('selected');
+          } else {
+            if (selectedRight) selectedRight.classList.remove('selected');
+            selectedRight = node;
+            node.classList.add('selected');
+          }
+
+          tryMatch();
+        });
+      });
+    }
+
+    function getDiscountPercent(code) {
+      return DISCOUNT_CODES[String(code || '').trim().toUpperCase()] || 0;
+    }
+
+    function updatePurchaseSummary() {
+      if (!currentPurchaseProduct) return;
+      const qty = Math.max(1, Number(document.getElementById('purchaseQty').value || 1));
+      const code = document.getElementById('discountCode').value.trim().toUpperCase();
+      const discount = getDiscountPercent(code);
+      const base = currentPurchaseProduct.price * qty;
+      const total = Math.round(base * (1 - discount / 100));
+
+      document.getElementById('summaryBase').textContent = formatPrice(base);
+      document.getElementById('summaryDiscount').textContent = discount ? `-${discount}%` : '—';
+      document.getElementById('summaryTotal').textContent = formatPrice(total);
+
+      const preview = document.getElementById('discountPreview');
+      if (discount) {
+        preview.style.display = 'flex';
+        document.getElementById('discountBadge').textContent = `Kod: ${code}`;
+        document.getElementById('discountValue').textContent = `Zniżka ${discount}%`;
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    function openPurchaseModal(productId) {
+      currentPurchaseProduct = productionData[productId];
+      if (!currentPurchaseProduct) return;
+
+      document.getElementById('purchaseProductName').value = currentPurchaseProduct.name;
+      document.getElementById('buyerName').value = '';
+      document.getElementById('buyerIC').value = '';
+      document.getElementById('purchaseQty').value = 1;
+      document.getElementById('discountCode').value = '';
+      updatePurchaseSummary();
+
+      document.getElementById('purchaseOverlay').classList.add('show');
+    }
+
+    function closePurchaseModal() {
+      document.getElementById('purchaseOverlay').classList.remove('show');
+    }
+
+    function confirmPurchase() {
+      const name = document.getElementById('buyerName').value.trim();
+      const ic = document.getElementById('buyerIC').value.trim();
+      const qty = Math.max(1, Number(document.getElementById('purchaseQty').value || 1));
+
+      if (!name || !ic) {
+        showToast('Błąd', 'Uzupełnij imię i nazwisko oraz numer IC.', 'warning');
+        return;
+      }
+
+      inventory[currentPurchaseProduct.id] = (inventory[currentPurchaseProduct.id] || 0) + qty;
+      saveGame();
+      renderAll();
+      closePurchaseModal();
+      openSuccessModal(`Zamówiono: <strong>${currentPurchaseProduct.name}</strong><br>Ilość: <strong>${qty}</strong>`);
+    }
+
+    function openInventoryModal() {
+      renderInventory();
+      document.getElementById('inventoryOverlay').classList.add('show');
+    }
+
+    function closeInventoryModal() {
+      document.getElementById('inventoryOverlay').classList.remove('show');
+    }
+
+    function openSuccessModal(text) {
+      document.getElementById('successText').innerHTML = text;
+      document.getElementById('successOverlay').classList.add('show');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successOverlay').classList.remove('show');
+    }
+
+    function addTestResources() {
+      const bonus = {
+        'włókno techniczne': 12,
+        'kevlar surowy': 10,
+        'stal surowa': 10,
+        'polimer': 10,
+        'aluminium surowe': 8,
+        'szkło techniczne': 6,
+        'ogniwo zasilające': 6,
+        'skóra techniczna': 4,
+        'chemikalia przemysłowe': 3,
+        'pigment premium': 3
+      };
+      Object.entries(bonus).forEach(([k,v]) => resources[k] = (resources[k] || 0) + v);
+      renderAll();
+      saveGame();
+      showToast('Dodano zasoby', 'Pakiet testowy został dodany.', 'success');
+    }
+
+    function dailyPack() {
+      const bonus = {
+        'włókno techniczne': 5,
+        'kevlar surowy': 4,
+        'stal surowa': 4,
+        'polimer': 4
+      };
+      Object.entries(bonus).forEach(([k,v]) => resources[k] = (resources[k] || 0) + v);
+      renderAll();
+      saveGame();
+      showToast('Pakiet dzienny', 'Otrzymałeś codzienne zasoby.', 'success');
+    }
+
+    function resetGame() {
+      if (!confirm('Na pewno zresetować całą grę?')) return;
+      localStorage.removeItem('armor_resources');
+      localStorage.removeItem('armor_inventory');
+      localStorage.removeItem('armor_progress');
+      localStorage.removeItem('armor_tab');
+      localStorage.removeItem('armor_category');
+      location.reload();
+    }
+
+    function initChat() {
+      const chatFab = document.getElementById('chatFab');
+      const chatModal = document.getElementById('chatModal');
+      const chatClose = document.getElementById('chatClose');
+      const chatSend = document.getElementById('chatSend');
+      const chatInput = document.getElementById('chatInput');
+
+      chatFab.addEventListener('click', () => {
+        chatModal.style.display = 'flex';
+        chatFab.style.display = 'none';
+        chatInput.focus();
+      });
+
+      chatClose.addEventListener('click', () => {
+        chatModal.style.display = 'none';
+        chatFab.style.display = 'grid';
+      });
+
+      function sendMessage() {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+
+        const messagesDiv = document.getElementById('chatMessages');
+        const m = document.createElement('div');
+        m.className = 'chat-message user';
+        m.innerHTML = '<i class="fas fa-user"></i> ' + msg;
+        messagesDiv.appendChild(m);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        chatInput.value = '';
+
+        setTimeout(function() {
+          const r = ['Dziękujemy!', 'Zgłoszenie przyjęte.', 'Skontaktuj się też na Discordzie!'];
+          const rm = document.createElement('div');
+          rm.className = 'chat-message support';
+          rm.innerHTML = '<i class="fas fa-headset"></i> ' + r[Math.floor(Math.random() * r.length)];
+          messagesDiv.appendChild(rm);
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 900);
+      }
+
+      chatSend.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage();
+      });
+    }
+
+    function renderAll() {
+      renderShopProducts();
+      renderProductionPanel();
+      renderResources();
+      renderWorkstations();
+      renderProductionProducts();
+      renderInventory();
+      updateProductionFlow();
+    }
+
+    function initEvents() {
+      document.getElementById('shopSearch').addEventListener('input', renderShopProducts);
+      document.getElementById('shopFilter').addEventListener('change', renderShopProducts);
+      document.getElementById('shopSort').addEventListener('change', renderShopProducts);
+      document.getElementById('refreshShopBtn').addEventListener('click', renderShopProducts);
+      document.getElementById('openInventoryBtn').addEventListener('click', openInventoryModal);
+      document.getElementById('addResourcesBtn').addEventListener('click', addTestResources);
+      document.getElementById('dailyPackBtn').addEventListener('click', dailyPack);
+      document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+      document.getElementById('purchaseQty').addEventListener('input', updatePurchaseSummary);
+      document.getElementById('discountCode').addEventListener('input', updatePurchaseSummary);
+
+      document.querySelectorAll('.overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => {
+          if (e.target === overlay) overlay.classList.remove('show');
+        });
+      });
+    }
+
+    loadGame();
+    initTabs();
+    initCategoryFilters();
+    initEvents();
+    initChat();
+    renderAll();
+  </script>
+</body>
+</html>
