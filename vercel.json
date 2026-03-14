@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": [
+        "server.js",
+        "index.html",
+        "pages/**",
+        "css/**",
+        "js/**",
+        "images/**",
+        "sound/**",
+        "orders.json",
+        "gallery.json",
+        "bans.json",
+        "logs.json"
+      ]
+    }
+  },
+  "routes": [
+    {
+      "src": "^/(.*)$",
+      "dest": "/api/index.js?__path=/$1"
+    }
+  ]
+}
