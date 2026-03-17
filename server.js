@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const passport = require('passport');
-const DiscordStrategy = require('passport-discord');
 const { Client, GatewayIntentBits, ChannelType, ThreadAutoArchiveDuration } = require('discord.js');
 const path = require('path');
 const fetch = require('node-fetch');
@@ -13,6 +11,22 @@ const mysql = require('mysql2/promise');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+
+const ROOT_INDEX_PATH = path.join(__dirname, 'index.html');
+const rootHtmlFallback = `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ARMOR Shop</title></head><body><h1>ARMOR Shop</h1><p>Strona główna jest tymczasowo niedostępna jako plik statyczny.</p></body></html>`;
+
+function sendRootIndex(res) {
+    return res.sendFile(ROOT_INDEX_PATH, function(err) {
+        if (!err) return;
+        return res.status(200).type('html').send(rootHtmlFallback);
+    });
+}
+
+const hasDiscordOAuthConfig = Boolean(
+    process.env.DISCORD_CLIENT_ID &&
+    process.env.DISCORD_CLIENT_SECRET &&
+    process.env.DISCORD_REDIRECT_URI
+);
 
 // Database connection pool
 let pool;
@@ -29,13 +43,14 @@ async function initDatabase() {
             connectionLimit: 10,
             queueLimit: 0
         });
-        console.log('Connected to MySQL database');
-        
+
         const connection = await pool.getConnection();
         connection.release();
+        console.log('Connected to MySQL database');
         console.log('Database connection pool created');
     } catch (error) {
-        console.error('Database connection error:', error.message);
+        const dbErrorMessage = error && error.message ? error.message : 'Unknown MySQL connection error';
+        console.error('Database connection error:', dbErrorMessage);
         pool = null;
         console.log('Falling back to JSON file storage');
     }
@@ -476,21 +491,15 @@ function requireJWT(req, res, next) {
     next();
 }
 
-// Passport Discord setup
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
-
-passport.use(new DiscordStrategy({
-    clientID: process.env.DISCORD_CLIENT_ID,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET,
-    callbackURL: process.env.DISCORD_REDIRECT_URI
-}, (accessToken, refreshToken, profile, done) => {
-    process.nextTick(() => done(null, profile));
-}));
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(function(req, res, next) {
+    const releaseId = process.env.VERCEL_GIT_COMMIT_SHA || process.env.RELEASE_ID || 'local';
+    res.setHeader('X-Armor-Release', releaseId);
+    next();
+});
 
 app.use(session({
     secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
@@ -503,8 +512,13 @@ app.use(session({
     }
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(function(req, res, next) {
+    req.user = req.session && req.session.user ? req.session.user : null;
+    req.isAuthenticated = function() {
+        return Boolean(req.user);
+    };
+    next();
+});
 
 // Auth middleware
 function requireAuth(req, res, next) {
@@ -530,13 +544,13 @@ function requireAdmin(req, res, next) {
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    maxRequests: 100,
+    max: 100,
     message: 'Zbyt wiele zapytań. Spróbuj później.'
 });
 
 const ordersRateLimit = rateLimit({
     windowMs: 60 * 1000,
-    maxRequests: 5,
+    max: 5,
     message: 'Zbyt wiele zamówień. Odczekaj chwilę.'
 });
 
@@ -599,6 +613,19 @@ app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(__dirname));
 
 // Page routes
+app.get('/', function(req, res) {
+    return sendRootIndex(res);
+});
+
+app.get('/api/healthz', function(req, res) {
+    return res.json({
+        ok: true,
+        service: 'armor-web',
+        release: process.env.VERCEL_GIT_COMMIT_SHA || process.env.RELEASE_ID || 'local',
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.get('/sklep', function(req, res) {
     res.sendFile(path.join(__dirname, 'pages', 'sklep.html'));
 });
@@ -627,10 +654,18 @@ app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/sound', express.static(path.join(__dirname, 'sound')));
 
+app.get('/favicon.ico', function(req, res) {
+    return res.status(204).end();
+});
+
+app.get('/favicon.png', function(req, res) {
+    return res.status(204).end();
+});
+
 // Chat AI endpoint
 const chatRateLimit = rateLimit({
     windowMs: 60 * 1000,
-    maxRequests: 10,
+    max: 10,
     message: 'Zbyt wiele wiadomości. Odczekaj chwilę.',
     keyGenerator: (req) => req.ip + '_chat'
 });
@@ -700,18 +735,83 @@ app.post('/api/chat', chatRateLimit, async (req, res) => {
 });
 
 // Discord OAuth
-app.get('/auth/discord', passport.authenticate('discord', { scope: discordScopes }));
-
-app.get('/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/login' }), async function(req, res) {
-    // Check if user has required role for production
-    if (req.user.roles) {
-        req.session.userRoles = req.user.roles;
+app.get('/auth/discord', function(req, res) {
+    if (!hasDiscordOAuthConfig) {
+        return res.status(503).json({ error: 'Logowanie Discord jest chwilowo niedostępne' });
     }
-    res.redirect('/');
+
+    const state = crypto.randomBytes(16).toString('hex');
+    req.session.discordOAuthState = state;
+
+    const params = new URLSearchParams({
+        client_id: process.env.DISCORD_CLIENT_ID,
+        redirect_uri: process.env.DISCORD_REDIRECT_URI,
+        response_type: 'code',
+        scope: discordScopes.join(' '),
+        state,
+        prompt: 'none'
+    });
+
+    return res.redirect('https://discord.com/api/oauth2/authorize?' + params.toString());
+});
+
+app.get('/auth/discord/callback', async function(req, res) {
+    if (!hasDiscordOAuthConfig) {
+        return res.redirect('/login');
+    }
+
+    const { code, state } = req.query;
+    if (!code || !state || state !== req.session.discordOAuthState) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                client_id: process.env.DISCORD_CLIENT_ID,
+                client_secret: process.env.DISCORD_CLIENT_SECRET,
+                grant_type: 'authorization_code',
+                code: String(code),
+                redirect_uri: process.env.DISCORD_REDIRECT_URI
+            }).toString()
+        });
+
+        if (!tokenResponse.ok) {
+            return res.redirect('/login');
+        }
+
+        const tokenData = await tokenResponse.json();
+        const userResponse = await fetch('https://discord.com/api/users/@me', {
+            headers: { Authorization: 'Bearer ' + tokenData.access_token }
+        });
+
+        if (!userResponse.ok) {
+            return res.redirect('/login');
+        }
+
+        const profile = await userResponse.json();
+        req.session.user = {
+            id: profile.id,
+            username: profile.username,
+            discriminator: profile.discriminator,
+            avatar: profile.avatar,
+            roles: []
+        };
+        req.session.userRoles = [];
+        delete req.session.discordOAuthState;
+        return res.redirect('/');
+    } catch (error) {
+        console.log('Discord OAuth callback error:', error.message);
+        return res.redirect('/login');
+    }
 });
 
 app.get('/logout', function(req, res) {
-    req.logout(function() { res.redirect('/'); });
+    req.session.destroy(function() {
+        res.redirect('/');
+    });
 });
 
 // User info endpoint
@@ -1148,9 +1248,28 @@ app.post('/api/break-mode', requireAuth, function(req, res) {
     res.json({ success: true, ...breakMode });
 });
 
-// Admin page
-app.get('/admin', function(req, res) {
-    res.sendFile(path.join(__dirname, 'pages', 'admin.html'));
+app.get('*', function(req, res, next) {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/auth/')) {
+        return next();
+    }
+
+    return sendRootIndex(res);
 });
+
+app.use(function(req, res) {
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Not Found' });
+    }
+
+    return res.status(404).send('Not Found');
+});
+
+const PORT = Number(process.env.PORT) || 3000;
+
+if (require.main === module) {
+    app.listen(PORT, function() {
+        console.log('Server running on port ' + PORT);
+    });
+}
 
 module.exports = app;

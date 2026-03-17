@@ -2,10 +2,10 @@
   "name": "armor-shop",
   "version": "1.0.0",
   "description": "",
-  "main": "server-fixed.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server-fixed.js",
-    "dev": "node server-fixed.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "discord.js": "^14.25.1",
@@ -15,8 +15,6 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.19.1",
-    "node-fetch": "^2.7.0",
-    "passport": "^0.7.0",
-    "passport-discord": "^0.1.4"
+    "node-fetch": "^2.7.0"
   }
 }
